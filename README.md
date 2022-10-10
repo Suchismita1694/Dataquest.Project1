@@ -169,21 +169,16 @@ ON LE.customerNumber = c.customerNumber
 ORDER BY LE.profit ASC
 LIMIT 5;
 ```
--- LTV
+-- LTV (Sub query)
 
 
 ```
-with
-money_spent_by_customer AS 
-(
-SELECT o.customerNumber, SUM(quantityOrdered * (priceEach - buyPrice)) AS profit
-FROM products p
-JOIN orderdetails od
-ON p.productCode = od.productCode
-JOIN orders o
-ON o.orderNumber = od.orderNumber
-GROUP BY o.customerNumber
-)
 SELECT AVG(mc.profit) as avg_money
-from money_spent_by_customer mc
+from (SELECT o.customerNumber, SUM(quantityOrdered * (priceEach - buyPrice)) AS profit
+        FROM products p
+        JOIN orderdetails od
+          ON p.productCode = od.productCode
+        JOIN orders o
+          ON o.orderNumber = od.orderNumber
+    GROUP BY o.customerNumber) AS mc
 ```
